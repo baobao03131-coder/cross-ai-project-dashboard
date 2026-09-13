@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>跨AI项目思维体系 · 项目工作台</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  padding: 20px;
+  color: #333;
+}
+.container { max-width: 1200px; margin: 0 auto; }
+
+/* 头部 */
+.header {
+  background: rgba(255,255,255,0.95);
+  border-radius: 16px;
+  padding: 30px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+}
+.header h1 {
+  font-size: 28px;
+  color: #1a1a2e;
+  margin-bottom: 8px;
+}
+.header .subtitle {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+.project-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.meta-card {
+  flex: 1;
+  min-width: 140px;
+  background: #f8f9ff;
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+}
+.meta-card .label { font-size: 12px; color: #888; margin-bottom: 6px; }
+.meta-card .value { font-size: 24px; font-weight: 700; color: #667eea; }
+.meta-card .value.green { color: #10b981; }
+.meta-card .value.orange { color: #f59e0b; }
+
+/* 总进度条 */
+.progress-section {
+  background: rgba(255,255,255,0.95);
+  border-radius: 16px;
+  padding: 30px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+}
+.progress-section h2 {
+  font-size: 20px;
+  margin-bottom: 20px;
+  color: #1a1a2e;
+}
+.progress-bar-container {
+  background: #e5e7eb;
+  border-radius: 12px;
+  height: 32px;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 12px;
+}
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  border-radius: 12px;
+  transition: width 0.8s ease;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 12px;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+}
+.progress-text { text-align: right; color: #666; font-size: 14px; }
+
+/* 五步法 */
+.steps-section {
+  background: rgba(255,255,255,0.95);
+  border-radius: 16px;
+  padding: 30px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+}
+.steps-section h2 {
+  font-size: 20px;
+  margin-bottom: 24px;
+  color: #1a1a2e;
+}
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+}
+.step-card {
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  position: relative;
+}
+.step-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+.step-card.completed { background: #ecfdf5; border-color: #10b981; }
+.step-card.active { background: #eff6ff; border-color: #3b82f6; }
+.step-card.pending { background: #f9fafb; border-color: #e5e7eb; }
+.step-number {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+.completed .step-number { background: #10b981; color: white; }
+.active .step-number { background: #3b82f6; color: white; }
+.pending .step-number { background: #d1d5db; color: #6b7280; }
+.step-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+.step-desc { font-size: 13px; color: #666; line-height: 1.5; }
+.step-status {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 8px;
+}
+.completed .step-status { background: #d1fae5; color: #065f46; }
+.active .step-status { background: #dbeafe; color: #1e40af; }
+.pending .step-status { background: #f3f4f6; color: #6b7280; }
+
+/* 详情面板 */
+.detail-section {
+  background: rgba(255,255,255,0.95);
+  border-radius: 16px;
+  padding: 30px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  display: none;
+}
+.detail-section.show { display: block; }
+.detail-section h3 {
+  font-size: 18px;
+  margin-bottom: 16px;
+  color: #1a1a2e;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.detail-content { line-height: 1.8; color: #444; font-size: 14px; }
+.detail-content ul { padding-left: 20px; margin: 12px 0; }
+.detail-content li { margin-bottom: 8px; }
+.tag {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  margin-right: 6px;
+  margin-bottom: 6px;
+}
+.tag.green { background: #d1fae5; color: #065f46; }
+.tag.blue { background: #dbeafe; color: #1e40af; }
+.tag.orange { background: #fef3c7; color: #92400e; }
+
+/* 产出物 */
+.outputs-section {
+  background: rgba(255,255,255,0.95);
+  border-radius: 16px;
+  padding: 30px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+}
+.outputs-section h2 {
+  font-size: 20px;
+  margin-bottom: 20px;
+  color: #1a1a2e;
+}
+.outputs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+.output-card {
+  background: #f8f9ff;
+  border-radius: 12px;
+  padding: 20px;
+  border-left: 4px solid #667eea;
+}
+.output-card h4 { font-size: 15px; margin-bottom: 10px; color: #1a1a2e; }
+.output-card p { font-size: 13px; color: #666; line-height: 1.6; }
+.output-card .status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+.status-dot.green { background: #10b981; }
+.status-dot.orange { background: #f59e0b; }
+
+/* 底部 */
+.footer {
+  text-align: center;
+  color: rgba(255,255,255,0.8);
+  font-size: 13px;
+  padding: 20px;
+}
+
+/* 响应式 */
+@media (max-width: 640px) {
+  body { padding: 12px; }
+  .header { padding: 20px; }
+  .header h1 { font-size: 22px; }
+  .meta-card { min-width: 100px; padding: 12px; }
+  .meta-card .value { font-size: 20px; }
+  .steps-grid { grid-template-columns: 1fr; }
+  .outputs-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- 头部 -->
+  <div class="header">
+    <h1>🚀 跨AI项目思维体系</h1>
+    <div class="subtitle">项目工作台 · 总览全局进度 · 每一步都有迹可循</div>
+    <div class="project-meta">
+      <div class="meta-card">
+        <div class="label">项目状态</div>
+        <div class="value green">进行中</div>
+      </div>
+      <div class="meta-card">
+        <div class="label">整体进度</div>
+        <div class="value" id="overallProgress">85%</div>
+      </div>
+      <div class="meta-card">
+        <div class="label">已完成步骤</div>
+        <div class="value">5/6</div>
+      </div>
+      <div class="meta-card">
+        <div class="label">产出物数量</div>
+        <div class="value orange">15+</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 总进度条 -->
+  <div class="progress-section">
+    <h2>📊 项目整体进度</h2>
+    <div class="progress-bar-container">
+      <div class="progress-bar" id="progressBar" style="width: 85%">85%</div>
+    </div>
+    <div class="progress-text">预计完成时间：2026-09-13 · 已进入质检优化阶段</div>
+  </div>
+
+  <!-- 五步法 -->
+  <div class="steps-section">
+    <h2>🔄 五步法流程（点击查看详情）</h2>
+    <div class="steps-grid">
+      <div class="step-card completed" onclick="showDetail(0)">
+        <div class="step-status">已完成</div>
+        <div class="step-number">1</div>
+        <div class="step-title">方案设计</div>
+        <div class="step-desc">AI主动反问，自动生成上下文卡片，输出方案</div>
+      </div>
+      <div class="step-card completed" onclick="showDetail(1)">
+        <div class="step-status">已完成</div>
+        <div class="step-number">2</div>
+        <div class="step-title">Demo验证</div>
+        <div class="step-desc">小样本验证，左右对比表，确认流程跑通</div>
+      </div>
+      <div class="step-card completed" onclick="showDetail(2)">
+        <div class="step-status">已完成</div>
+        <div class="step-number">3</div>
+        <div class="step-title">规范执行</div>
+        <div class="step-desc">按验证过的方案规模化执行，全程1个窗口</div>
+      </div>
+      <div class="step-card completed" onclick="showDetail(3)">
+        <div class="step-status">已完成</div>
+        <div class="step-number">4</div>
+        <div class="step-title">复盘归档</div>
+        <div class="step-desc">写执行记录，更新项目入口，提取可复用资产</div>
+      </div>
+      <div class="step-card completed" onclick="showDetail(4)">
+        <div class="step-status">已完成</div>
+        <div class="step-number">5</div>
+        <div class="step-title">操作日志与一鱼多吃</div>
+        <div class="step-desc">一份投入三份产出：汇报+AI记忆+自媒体内容</div>
+      </div>
+      <div class="step-card active" onclick="showDetail(5)">
+        <div class="step-status">进行中</div>
+        <div class="step-number">6</div>
+        <div class="step-title">项目级质检</div>
+        <div class="step-desc">站在老板维度找问题，给出优化建议</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 详情面板 -->
+  <div class="detail-section" id="detailSection">
+    <h3 id="detailTitle">详情</h3>
+    <div class="detail-content" id="detailContent"></div>
+  </div>
+
+  <!-- 产出物 -->
+  <div class="outputs-section">
+    <h2>📦 已产出物</h2>
+    <div class="outputs-grid">
+      <div class="output-card">
+        <h4><span class="status-dot green"></span>公司化项目管理SOP V2.0</h4>
+        <p>五阶段闭环、四层知识库、AI主动拆窗机制，给AI和自己用的深度规范</p>
+      </div>
+      <div class="output-card">
+        <h4><span class="status-dot green"></span>1+1+1一键启动包</h4>
+        <p>1份快速上手指南 + 1个项目模板 + 1个演示案例，新人15分钟跑通</p>
+      </div>
+      <div class="output-card">
+        <h4><span class="status-dot green"></span>新手启航包（9份文档）</h4>
+        <p>从零基础到独立使用的完整培训材料，可直接用于员工培训</p>
+      </div>
+      <div class="output-card">
+        <h4><span class="status-dot green"></span>给老板看的整体方案</h4>
+        <p>结论先行、收益前置、简洁快速的向上汇报文档</p>
+      </div>
+      <div class="output-card">
+        <h4><span class="status-dot green"></span>飞书知识库（三层结构）</h4>
+        <p>对外产品 / 对内构建 / 质检报告，层级清晰，可公开分享</p>
+      </div>
+      <div class="output-card">
+        <h4><span class="status-dot green"></span>操作日志与一鱼多吃</h4>
+        <p>给老板的汇报 + 给AI的结构化日志 + 公众号/小红书/短视频文案</p>
+      </div>
+      <div class="output-card">
+        <h4><span class="status-dot green"></span>质检报告</h4>
+        <p>站在项目总经理维度的整体质检，含优点、问题、简化建议、产品化建议</p>
+      </div>
+      <div class="output-card">
+        <h4><span class="status-dot orange"></span>HTML可视化工作台</h4>
+        <p>当前页面，可视化展示项目进度，手机电脑都能用，可公开分享</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    跨AI项目思维体系 · 让每一次AI协作都有迹可循、有法可依、有物可复用
+  </div>
+</div>
+
+<script>
+const details = [
+  {
+    title: "第一步：方案设计",
+    content: `
+      <p><span class="tag green">已完成</span></p>
+      <ul>
+        <li><strong>人做什么：</strong>用大白话说需求（口喷就行），不用自己写上下文卡片</li>
+        <li><strong>AI做什么：</strong>主动反问6个关键问题（主题/受众/字数/风格/截止时间/参考），然后自动生成上下文卡片</li>
+        <li><strong>产出：</strong>方案文档 + 上下文卡片（AI生成，人确认）</li>
+        <li><strong>自检：</strong>方案是否完整？有没有遗漏？拆窗是否合理？</li>
+        <li><strong>关键规则：</strong>同一任务不拆窗，只有完全不相关的新任务才新开窗口</li>
+      </ul>
+    `
+  },
+  {
+    title: "第二步：Demo验证",
+    content: `
+      <p><span class="tag green">已完成</span></p>
+      <ul>
+        <li><strong>人做什么：</strong>检查Demo，扫一眼左右对比表的"改动说明"和"修改后"，打勾或打叉</li>
+        <li><strong>AI做什么：</strong>做小样本（大纲+第一段），输出左右对比表，标注改动类型</li>
+        <li><strong>产出：</strong>Demo样本 + 验证结论</li>
+        <li><strong>自检：</strong>Demo是否验证了关键风险？风格对不对？结构合不合理？</li>
+        <li><strong>核心工具：</strong>左右对比表（原文/修改后/改动说明/我的确认）</li>
+      </ul>
+    `
+  },
+  {
+    title: "第三步：规范执行",
+    content: `
+      <p><span class="tag green">已完成</span></p>
+      <ul>
+        <li><strong>人做什么：</strong>过程中不需要做什么，AI自动完成，有问题随时提</li>
+        <li><strong>AI做什么：</strong>按Demo验证过的结构规模化执行，写执行记录</li>
+        <li><strong>产出：</strong>全部产出物</li>
+        <li><strong>自检：</strong>执行结果是否符合交付标准？字数/风格/结构是否达标？</li>
+        <li><strong>关键规则：</strong>全程1个窗口，上下文不丢失，迭代优化在同一窗口完成</li>
+      </ul>
+    `
+  },
+  {
+    title: "第四步：复盘归档",
+    content: `
+      <p><span class="tag green">已完成</span></p>
+      <ul>
+        <li><strong>人做什么：</strong>检查项目入口是否更新正确，把成品同步到飞书</li>
+        <li><strong>AI做什么：</strong>写复盘记录，更新项目入口，整理文件，提取可复用模板</li>
+        <li><strong>产出：</strong>复盘记录 + 更新后的项目入口 + 可复用资产</li>
+        <li><strong>自检：</strong>归档是否完整？入口是否更新？可复用资产是否提取？</li>
+        <li><strong>四层归档：</strong>GitHub真相源 → 项目级目录 → 跨AI共享库 → 飞书</li>
+      </ul>
+    `
+  },
+  {
+    title: "第五步：操作日志与一鱼多吃",
+    content: `
+      <p><span class="tag green">已完成</span> <span class="tag blue">必须做，不能省略</span></p>
+      <ul>
+        <li><strong>产物1：操作日志</strong>
+          <ul>
+            <li>给老板看：项目汇报材料，进度随时可查</li>
+            <li>给AI看：结构化日志，AI了解你的习惯，下次协作更顺畅</li>
+          </ul>
+        </li>
+        <li><strong>产物2：一鱼多吃内容</strong>
+          <ul>
+            <li>公众号长文（1500-3000字）</li>
+            <li>小红书文案（900字以内）</li>
+            <li>短视频口播（60秒）</li>
+          </ul>
+        </li>
+        <li><strong>自检：</strong>两个产物是否都产出了？是否存入对应文件夹？</li>
+        <li><strong>核心理念：</strong>一份投入，多份产出，做项目的过程变成内容</li>
+      </ul>
+    `
+  },
+  {
+    title: "第六步：项目级质检",
+    content: `
+      <p><span class="tag orange">进行中</span></p>
+      <ul>
+        <li><strong>触发时机：</strong>归档完成后自动触发，或用户说"差不多了/质检一下"</li>
+        <li><strong>质检维度：</strong>站在项目总经理/老板维度，不附和，真找问题</li>
+        <li><strong>输出格式：</strong>
+          <ul>
+            <li>做得好的地方（2-3条）</li>
+            <li>核心问题（2-3条）</li>
+            <li>简化建议（怎么更简单、更快速）</li>
+            <li>产品化建议（能不能包装、怎么卖）</li>
+            <li>下一步行动（1-2条最优先）</li>
+          </ul>
+        </li>
+        <li><strong>当前质检结论：</strong>整体评分7.5/10，内容已够，缺的是整理和包装</li>
+      </ul>
+    `
+  }
+];
+
+function showDetail(index) {
+  const section = document.getElementById('detailSection');
+  const title = document.getElementById('detailTitle');
+  const content = document.getElementById('detailContent');
+  title.innerHTML = details[index].title;
+  content.innerHTML = details[index].content;
+  section.classList.add('show');
+  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// 页面加载时动画
+window.addEventListener('load', function() {
+  const bar = document.getElementById('progressBar');
+  bar.style.width = '0%';
+  setTimeout(() => { bar.style.width = '85%'; }, 300);
+});
+</script>
+</body>
+</html>
